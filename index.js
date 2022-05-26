@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,13 +21,37 @@ async function run() {
         const productCollection = client.db('bikeMenufacture').collection('products');
         const reviewCollection = client.db('bike_reviews').collection('reviews');
 
-
+        // GET products API
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
         })
+        // GET products API
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.findOne(query);
+            res.send(result);
+        })
+        // POST product API
+        app.post('/product', async (req, res) => {
+            const data = req.body;
+            const result = await productCollection.insertOne(data);
+            res.send(result);
+        });
+
+        //DELETE product API
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            console.log(result)
+            res.send(result);
+        });
 
 
         // GET reviews API
@@ -35,6 +60,13 @@ async function run() {
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        });
+
+        // POST reviews API
+        app.post('/review', async (req, res) => {
+            const data = req.body;
+            const result = await reviewCollection.insertOne(data);
+            res.send(result);
         });
 
     }

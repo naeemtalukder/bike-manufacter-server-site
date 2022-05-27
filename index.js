@@ -19,6 +19,7 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('bikeMenufacture').collection('products');
+        const orderCollection = client.db('bikeMenufacture').collection('orders');
         const reviewCollection = client.db('bike_reviews').collection('reviews');
 
         // GET products API
@@ -50,6 +51,13 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
             console.log(result)
+            res.send(result);
+        });
+
+        // POST product API
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
             res.send(result);
         });
 

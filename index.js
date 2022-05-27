@@ -28,9 +28,22 @@ async function run() {
         await client.connect();
         console.log('db connect');
         const productCollection = client.db('bikeMenufacture').collection('products');
-
         const orderCollection = client.db('bike_orders').collection('orders');
         const reviewCollection = client.db('bike_reviews').collection('reviews');
+        const userCollection = client.db('bike_user').collection('users');
+
+        //PUT users API
+        app.put('/user/:email', (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })s
 
         // GET products API
         app.get('/product', async (req, res) => {
@@ -70,6 +83,8 @@ async function run() {
             const result = await orderCollection.insertOne(order);
             res.send(result);
         });
+
+        //GET order api
         app.get('/order', async (req, res) => {
             const user = req.query.user;
             const query = { user: user };

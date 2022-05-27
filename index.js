@@ -70,6 +70,12 @@ async function run() {
             const result = await orderCollection.insertOne(order);
             res.send(result);
         });
+        app.get('/order', async (req, res) => {
+            const user = req.query.user;
+            const query = { user: user };
+            const orders = await orderCollection.find(query).toArray();
+            res.send(orders);
+        })
 
 
         // GET reviews API

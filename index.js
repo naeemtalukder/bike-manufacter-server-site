@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -19,15 +19,15 @@ app.use(
 );
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ao6h9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uiw7b.mongodb.net/?retryWrites=true&w=majority`;
 console.log(uri);
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uiw7b.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
     if (!authHeader) {
         return res.status(401).send({ message: 'UnAuthorized access' });
     }
@@ -49,6 +49,23 @@ async function run() {
         const orderCollection = client.db('bike_orders').collection('orders');
         const reviewCollection = client.db('bike_reviews').collection('reviews');
         const userCollection = client.db('bike_user').collection('users');
+
+        //GET user API
+        app.get('/user', async (req, res) => {
+            const users = await userCollection.find().toArray();
+            res.send(users);
+        });
+
+        // //PUT admin API
+        // app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+        //     const email = req.params.email;
+        //     const filter = { email: email };
+        //     const updateDoc = {
+        //         $set: { role: 'admin' },
+        //     };
+        //     const result = await userCollection.updateOne(filter, updateDoc);
+        //     res.send(result);
+        // })
 
         //PUT users API
         app.put('/user/:email', async (req, res) => {
@@ -97,7 +114,7 @@ async function run() {
         });
 
         // POST product API
-        app.post('/order', verifyJWT, async (req, res) => {
+        app.post('/order', async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.send(result);

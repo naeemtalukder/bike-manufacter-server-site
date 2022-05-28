@@ -56,8 +56,16 @@ async function run() {
             res.send(users);
         });
 
+        //GET admin API
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
+
         //PUT admin API
-        app.put('/user/admin/:email', async (req, res) => {
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const requester = req.decoded.email;
             const requesterAccount = await userCollection.findOne({ email: requester });
@@ -70,7 +78,7 @@ async function run() {
                 res.send(result);
             }
             else {
-                return res.status(403).send({ message: 'forbidden access' });
+                res.status(403).send({ message: 'forbidden' });
             }
         })
 

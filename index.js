@@ -20,7 +20,6 @@ app.use(
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ao6h9.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 console.log(uri);
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uiw7b.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
@@ -127,6 +126,15 @@ async function run() {
             console.log(result)
             res.send(result);
         });
+
+
+        // order API
+        app.get('/order/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const order = await orderCollection.findOne(query);
+            res.send(order);
+        })
 
         // POST product API
         app.post('/order', async (req, res) => {
